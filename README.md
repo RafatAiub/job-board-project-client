@@ -28,7 +28,7 @@ src/
 
 * ✅ View all job listings
 * ✅ View detailed job description
-* ✅ Apply for a job (Name, Email, Resume Link)
+* ✅ Apply for a job (Name, Email, cv Link)
 * ✅ Admin login
 * ✅ Admin can add new jobs
 * ✅ Protected route for admin only

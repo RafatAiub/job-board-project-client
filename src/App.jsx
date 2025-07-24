@@ -7,24 +7,28 @@ import LoginPage from './pages/LoginPage';
 import AddJobPage from './pages/AddJobPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 
-
 function App() {
   return (
     <Router>
-      <Navbar />
-      <div className="container mx-auto px-4">
-        <Routes>
-          <Route path="/" element={<JobListPage />} />
-          <Route path="/jobs/:id" element={<JobDetailsPage />} />
-          <Route path="/apply/:id" element={<ApplyPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin/add-job" element={
-            <ProtectedRoute>
-              <AddJobPage />
-            </ProtectedRoute>
-          } />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+      <div className="min-h-screen bg-white text-gray-900">
+        <Navbar />
+        <main className="max-w-6xl mx-auto px-4 py-6">
+          <Routes>
+            <Route path="/" element={<JobListPage />} />
+            <Route path="/jobs/:id" element={<JobDetailsPage />} />
+            <Route path="/apply/:id" element={<ApplyPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/admin/add-job"
+              element={
+                <ProtectedRoute>
+                  <AddJobPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   );
