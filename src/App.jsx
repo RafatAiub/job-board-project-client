@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import JobListPage from './pages/JobListPage';
 import JobDetailsPage from './pages/JobDetailsPage';
 import ApplyPage from './pages/ApplyPage';
 import LoginPage from './pages/LoginPage';
 import AddJobPage from './pages/AddJobPage';
 import ProtectedRoute from './routes/ProtectedRoute';
-import Navbar from './components/Navbar';
+
 
 function App() {
   return (

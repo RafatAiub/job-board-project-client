@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import API from '../services/api';
+import JobCard from '../components/JobCard';
+
 
 const JobListPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -10,9 +11,14 @@ const JobListPage = () => {
     const fetchJobs = async () => {
       try {
         const res = await API.get('/jobs');
-        setJobs(res.data);
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
+        if (res.data && Array.isArray(res.data.jobs)) {
+          setJobs(res.data.jobs);
+        } else {
+          setJobs([]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch jobs:', err);
+        setJobs([]);
       } finally {
         setLoading(false);
       }
@@ -21,26 +27,18 @@ const JobListPage = () => {
     fetchJobs();
   }, []);
 
+  if (loading) return <p className="text-center">Loading jobs...</p>;
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6 text-center">Available Jobs</h1>
-      {loading ? (
-        <p className="text-center">Loading...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {jobs.map(job => (
-            <div key={job._id} className="border rounded-lg p-4 shadow hover:shadow-lg transition">
-              <h2 className="text-xl font-semibold">{job.title}</h2>
-              <p className="text-sm text-gray-500">{job.company} - {job.location}</p>
-              <p className="mt-2 text-gray-700 line-clamp-3">{job.description}</p>
-              <div className="mt-4 flex justify-between">
-                <Link to={`/jobs/${job._id}`} className="text-blue-600 font-medium hover:underline">Details</Link>
-                <Link to={`/apply/${job._id}`} className="text-green-600 font-medium hover:underline">Apply</Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6">Available Jobs</h1>
+      <div className="grid gap-4">
+        {jobs.length > 0 ? (
+          jobs.map((job) => <JobCard key={job._id} job={job} />)
+        ) : (
+          <p>No jobs found.</p>
+        )}
+      </div>
     </div>
   );
 };
