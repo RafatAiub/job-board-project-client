@@ -1,19 +1,23 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { BriefcaseBusiness } from 'lucide-react';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BriefcaseBusiness } from "lucide-react";
 const Navbar = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const location = useLocation();
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   return (
     <nav class="fixed w-full z-50 bg-white shadow-md border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-green-700">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-2xl font-bold text-green-700"
+        >
           <BriefcaseBusiness className="w-6 h-6" />
           JobBoard
         </Link>
@@ -27,7 +31,7 @@ const Navbar = () => {
             Home
           </Link> */}
 
-          {token && (
+          {token && location.pathname !== "/admin/add-job" && (
             <Link
               to="/admin/add-job"
               className="hover:text-green-600 transition-colors duration-200"
