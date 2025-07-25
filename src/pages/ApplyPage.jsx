@@ -1,35 +1,34 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import API from '../services/api';
 import { SendHorizonal } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { applySchema } from '../validation/applySchema';
+import { useState } from 'react';
 
 const ApplyPage = () => {
   const { id } = useParams();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    cv: '',
-  });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(applySchema),
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setMessage('');
     setIsError(false);
     try {
-      const res = await API.post('/applications', {
-        jobId: id,
-        ...formData,
-      });
+      await API.post('/applications', { jobId: id, ...data });
       setMessage('✅ Application submitted successfully!');
-      setFormData({ name: '', email: '', cv: '' });
-    } catch (err) {
-      setMessage('❌ Failed to apply. Make sure all fields are filled.');
+      reset();
+    } catch {
+      setMessage('❌ Failed to apply. Please try again.');
       setIsError(true);
     }
   };
@@ -52,34 +51,40 @@ const ApplyPage = () => {
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="text"
-            name="name"
-            placeholder="Your Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Your Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <input
-            type="url"
-            name="cv"
-            placeholder="Link to Your cv (e.g. Google Drive, PDF URL)"
-            value={formData.cv}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div>
+            <input
+              type="text"
+              placeholder="Your Full Name"
+              {...register('name')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="email"
+              placeholder="Your Email"
+              {...register('email')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="url"
+              placeholder="Link to Your cv (e.g. Google Drive, PDF URL)"
+              {...register('cv')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.cv && (
+              <p className="text-red-500 text-sm mt-1">{errors.cv.message}</p>
+            )}
+          </div>
           <button
             type="submit"
             className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow-md transition-all duration-200"

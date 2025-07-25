@@ -1,44 +1,40 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { addJobSchema } from '../validation/addJobSchema';
 import API from '../services/api';
-import { Briefcase, Building2, MapPin } from 'lucide-react';
+import { useState } from 'react';
 
 const AddJobPage = () => {
-  const [jobData, setJobData] = useState({
-    title: '',
-    company: '',
-    location: '',
-    description: ''
-  });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 
-  const handleChange = (e) => {
-    setJobData({ ...jobData, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(addJobSchema),
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setMessage('');
     setIsError(false);
     try {
-      const token = localStorage.getItem('token');
-      const res = await API.post('/jobs', jobData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessage('✅ Job added successfully!');
-      setJobData({ title: '', company: '', location: '', description: '' });
-    } catch (err) {
-      setMessage('❌ Failed to add job. You may not be authorized.');
+      await API.post('/jobs', data);
+      setMessage('✅ Job posted successfully!');
+      reset();
+    } catch {
+      setMessage('❌ Failed to post job. Please try again.');
       setIsError(true);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-sky-50 to-green-100 flex items-center justify-center px-4">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-2xl border border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center flex items-center justify-center gap-2">
-          <Briefcase className="w-6 h-6 text-green-600" />
-          Post a New Job
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 px-4">
+      <div className="bg-white shadow-xl border border-gray-200 rounded-xl p-8 w-full max-w-xl">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+          Add a New Job
         </h2>
 
         {message && (
@@ -51,48 +47,67 @@ const AddJobPage = () => {
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="text"
-            name="title"
-            placeholder="Job Title"
-            value={jobData.title}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <input
-            type="text"
-            name="company"
-            placeholder="Company"
-            value={jobData.company}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={jobData.location}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Job Description"
-            value={jobData.description}
-            onChange={handleChange}
-            rows={5}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          ></textarea>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div>
+            <input
+              type="text"
+              placeholder="Job Title"
+              {...register('title')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Company Name"
+              {...register('company')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.company && (
+              <p className="text-red-500 text-sm mt-1">{errors.company.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Location"
+              {...register('location')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.location && (
+              <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>
+            )}
+          </div>
+          <div>
+            <textarea
+              placeholder="Job Description"
+              {...register('description')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              rows={4}
+            />
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="number"
+              placeholder="Salary"
+              {...register('salary')}
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {errors.salary && (
+              <p className="text-red-500 text-sm mt-1">{errors.salary.message}</p>
+            )}
+          </div>
           <button
             type="submit"
             className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow-md transition-all duration-200"
           >
-            ➕ Add Job
+            ➕ Post Job
           </button>
         </form>
       </div>
